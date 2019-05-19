@@ -158,60 +158,63 @@ void CalibrateMagnetometer(fxos8700_i2c_sensorhandle_t FXOS8700drv)
     	status = FXOS8700_I2C_ReadData(&FXOS8700drv, FXOS8700_STATUS_READ, &dataReady);
     	if (dataReady)
     	{
-    		dataReady = 0;
+			dataReady = 0;
 
-    		status = FXOS8700_I2C_ReadData(&FXOS8700drv, FXOS8700_ACCELMAG_READ, AccelMagData);
+			status = FXOS8700_I2C_ReadData(&FXOS8700drv, FXOS8700_ACCELMAG_READ, AccelMagData);
 
-    		Mag_16_bit.mag[0] = ((int16_t)AccelMagData[6]<<8 | AccelMagData[7]);        // Compute 16-bit X-axis magnetic output value
-    		Mag_16_bit.mag[1] = ((int16_t)AccelMagData[8]<<8 | AccelMagData[9]);        // Compute 16-bit Y-axis magnetic output value
-    		Mag_16_bit.mag[2] = ((int16_t)AccelMagData[10]<<8 | AccelMagData[11]);        // Compute 16-bit Z-axis magnetic output value
+			Mag_16_bit.mag[0] = ((int16_t)AccelMagData[6]<<8 | AccelMagData[7]);        // Compute 16-bit X-axis magnetic output value
+			Mag_16_bit.mag[1] = ((int16_t)AccelMagData[8]<<8 | AccelMagData[9]);        // Compute 16-bit Y-axis magnetic output value
+			Mag_16_bit.mag[2] = ((int16_t)AccelMagData[10]<<8 | AccelMagData[11]);        // Compute 16-bit Z-axis magnetic output value
 
-    		if (i == 0)
-    		{
-    			Xout_Mag_16_bit_max = Mag_16_bit.mag[0];
-    			Xout_Mag_16_bit_min = Mag_16_bit.mag[0];
+			if (i == 0)
+			{
+				Xout_Mag_16_bit_max = Mag_16_bit.mag[0];
+				Xout_Mag_16_bit_min = Mag_16_bit.mag[0];
 
-    			Yout_Mag_16_bit_max = Mag_16_bit.mag[1];
-    			Yout_Mag_16_bit_min = Mag_16_bit.mag[1];
+				Yout_Mag_16_bit_max = Mag_16_bit.mag[1];
+				Yout_Mag_16_bit_min = Mag_16_bit.mag[1];
 
-    			Zout_Mag_16_bit_max = Mag_16_bit.mag[2];
-    			Zout_Mag_16_bit_min = Mag_16_bit.mag[2];
-    		}
-    		 if (Mag_16_bit.mag[0] > Xout_Mag_16_bit_max && Mag_16_bit.mag[0]!=0)
-    		 {
-    			 Xout_Mag_16_bit_max = Mag_16_bit.mag[0];
-    		 }
+				Zout_Mag_16_bit_max = Mag_16_bit.mag[2];
+				Zout_Mag_16_bit_min = Mag_16_bit.mag[2];
+			}
+			 if (Mag_16_bit.mag[0] > Xout_Mag_16_bit_max && Mag_16_bit.mag[0]!=0)
+			 {
+				 Xout_Mag_16_bit_max = Mag_16_bit.mag[0];
+			 }
 
-    		 if (Mag_16_bit.mag[0] < Xout_Mag_16_bit_min && Mag_16_bit.mag[0]!=0)
-    		 {
-    			 Xout_Mag_16_bit_min = Mag_16_bit.mag[0];
-    		 }
+			 if (Mag_16_bit.mag[0] < Xout_Mag_16_bit_min && Mag_16_bit.mag[0]!=0)
+			 {
+				 Xout_Mag_16_bit_min = Mag_16_bit.mag[0];
+			 }
 
-             if (Mag_16_bit.mag[1] > Yout_Mag_16_bit_max && Mag_16_bit.mag[1]!= 0)
-             {
-            	 Yout_Mag_16_bit_max = Mag_16_bit.mag[1];
-             }
+			 if (Mag_16_bit.mag[1] > Yout_Mag_16_bit_max && Mag_16_bit.mag[1]!= 0)
+			 {
+				 Yout_Mag_16_bit_max = Mag_16_bit.mag[1];
+			 }
 
-             if (Mag_16_bit.mag[1] < Yout_Mag_16_bit_min && Mag_16_bit.mag[1]!=0)
-             {
-            	 Yout_Mag_16_bit_min = Mag_16_bit.mag[1];
-             }
+			 if (Mag_16_bit.mag[1] < Yout_Mag_16_bit_min && Mag_16_bit.mag[1]!=0)
+			 {
+				 Yout_Mag_16_bit_min = Mag_16_bit.mag[1];
+			 }
 
 
 
-             // Check to see if current sample is the maximum or minimum Z-axis value
+			 // Check to see if current sample is the maximum or minimum Z-axis value
 
-             if (Mag_16_bit.mag[2] > Zout_Mag_16_bit_max && Mag_16_bit.mag[2]!=0)
-             {
-            	 Zout_Mag_16_bit_max = Mag_16_bit.mag[2];
-             }
+			 if (Mag_16_bit.mag[2] > Zout_Mag_16_bit_max && Mag_16_bit.mag[2]!=0)
+			 {
+				 Zout_Mag_16_bit_max = Mag_16_bit.mag[2];
+			 }
 
-             if (Mag_16_bit.mag[2] < Zout_Mag_16_bit_min && Mag_16_bit.mag[2]!=0)
-             {
-            	 Zout_Mag_16_bit_min = Mag_16_bit.mag[2];
-             }
+			 if (Mag_16_bit.mag[2] < Zout_Mag_16_bit_min && Mag_16_bit.mag[2]!=0)
+			 {
+				 Zout_Mag_16_bit_min = Mag_16_bit.mag[2];
+			 }
 
-             i++;
+			 i++;
+    	}
+    	if(i%100 == 0){
+    		PRINTF(".");
     	}
     }
 
@@ -438,70 +441,40 @@ int main(void)
 
     PIT_GetDefaultConfig(&pitConfig);
 
-        /* Init pit module */
-        PIT_Init(PIT, &pitConfig);
+	/* Init pit module */
+	PIT_Init(PIT, &pitConfig);
 
-        /* Set timer period for channel 0 */
-        PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(10000, PIT_SOURCE_CLOCK));
+	/* Set timer period for channel 0 */
+	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(10000, PIT_SOURCE_CLOCK));
 
-        /* Enable timer interrupts for channel 0 */
-        PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
-        //FXOS8700CQ_Accel_Calibration(FXOS8700drv);
-        CalibrateMagnetometer( FXOS8700drv);
-        /* Enable at the NVIC */
-        EnableIRQ(PIT_IRQ_ID);
-        PIT_StartTimer(PIT, kPIT_Chnl_0);
+	/* Enable timer interrupts for channel 0 */
+	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
+
+	//FXOS8700CQ_Accel_Calibration(FXOS8700drv);
+	PRINTF("\r\n Calibrating:");
+	CalibrateMagnetometer( FXOS8700drv);
+	PRINTF("Done! \r \n");
+	/* Enable at the NVIC */
+	EnableIRQ(PIT_IRQ_ID);
+	PIT_StartTimer(PIT, kPIT_Chnl_0);
 
     for (;;) /* Forever loop */
     {        /* In ISR Mode we do not need to check Data Ready Register.
               * The receipt of interrupt will indicate data is ready. */
 
-        /*if (false == fxas21002Interrupt)
-        {
-            SMC_SetPowerModeWait(SMC);
-            continue;
-        }
-        else
-        {
-            fxas21002Interrupt = false;
-            gpioDriver->toggle_pin(&GREEN_LED);
-        }*/
-
         status = FXOS8700_I2C_ReadData(&FXOS8700drv, FXOS8700_STATUS_READ, &dataReady);
-                /*if (0 == (dataReady & FXOS8700_DR_STATUS_ZYXDR_MASK))
-                {
-                    continue;
-                }*/
 
-                /*! Read the raw sensor data from the fxos8700. */
-                status = FXOS8700_I2C_ReadData(&FXOS8700drv, FXOS8700_ACCELMAG_READ, data2);
-                /*if (ARM_DRIVER_OK != status)
-                {
-                    PRINTF("\r\n Read Failed. \r\n");
-                    return -1;
-                }*/
-
+		/*! Read the raw sensor data from the fxos8700. */
+		status = FXOS8700_I2C_ReadData(&FXOS8700drv, FXOS8700_ACCELMAG_READ, data2);
 
         /*! Read the raw sensor data from the FXAS21002. */
         status = FXAS21002_I2C_ReadData(&FXAS21002drv, fxas21002_Output_Values, data);
-        /*if (ARM_DRIVER_OK != status)
-        {
-            PRINTF("\r\n Read Failed. \r\n");
-            return -1;
-        }*/
-
-
-
-
-        //PRINTF("\r\n Accel posX = %f  posY = %f\r\n", accel_ang_x, accel_ang_y);
 
         if(pitIsrFlag)
         {
         	pitIsrFlag = false;
 
         //dt = 1000;
-
-
 
             rawData2.accel[0] = ((int16_t)data2[0] << 8) | data2[1];
             rawData2.accel[0] /= 4;
@@ -519,64 +492,30 @@ int main(void)
 
             rawData2.mag[0] = ((((int16_t)data2[6] << 8) | data2[7]));
             magx =(rawData2.mag[0]-offset_x)*scale_x;
-            //magx = (float)(rawData2.mag[0]);
-//            magx = (float)(rawData2.mag[0])/10;
 
             rawData2.mag[1] = ((((int16_t)data2[8] << 8) | data2[9]));
             magy =(rawData2.mag[1]-offset_y)*scale_y;
-           // magy = (float)(rawData2.mag[1]);
-//            magy = (float)(rawData2.mag[1])/10;
+
             rawData2.mag[2] = ((((int16_t)data2[10] << 8) | data2[11]));
             magz =(rawData2.mag[2]-offset_z)*scale_z;
-           // magz = (float)(rawData2.mag[2]);
-//            magz = (float)(rawData2.mag[2])/10;
-            //accel_ang_x = atan(X/sqrt(pow(Y,2)+pow(Z,2)))*(360.0/3.14);
-            //accel_ang_y = atan(Y/sqrt(pow(X,2)+pow(Z,2)))*(360.0/3.14);
 
             /*! Convert the raw sensor data to signed 16-bit container for display to the debug port. */
             rawData.gyro[0] = ((int16_t)data[0] << 8) | data[1];
             rawData.gyro[1] = ((int16_t)data[2] << 8) | data[3];
             rawData.gyro[2] = ((int16_t)data[4] << 8) | data[5];
-            /*Angulos de inclinación*/
 
+            /*Angulos de inclinación*/
             gyroX = (float)rawData.gyro[0]/131;
             gyroY = (float)rawData.gyro[1]/131;
             gyroZ = (float)rawData.gyro[2]/131;
 
-            //ang_x = 0.2*(ang_x_prev+(gyroX/131)*10) + 0.8*accel_ang_x;
-            //ang_y = 0.2*(ang_y_prev+(gyroY/131)*10) + 0.8*accel_ang_y;
-
-
-            //ang_x_prev=ang_x;
-            //ang_y_prev=ang_y;
-
-/*
-		girosc_Ang_x = (gyroX)*1000/1000.0 + girosc_Ang_x_prev;
-        girosc_Ang_y = (gyroY)*1000/1000.0 + girosc_Ang_y_prev;
-
-
-
-        girosc_Ang_x_prev=girosc_Ang_x;
-        girosc_Ang_y_prev=girosc_Ang_y;
-*/
-
-            //Heading = atan2(magy, magx) * 180 / 3.1416;  // Compute Yaw angle
-            //counter += 1;
-           // MahonyAHRSupdateIMU(gyroX/131, gyroY/131, gyroZ/131, X, Y, Z,counter);
-            //MadgwickAHRSupdateIMU((gyroX), (gyroY), (gyroZ), X, Y, Z);
            MadgwickAHRSupdate((gyroX*3.1416/180), (gyroY*3.1416/180), (gyroZ*3.1416/180), X, Y, Z, magx, magy,magz);
         /* NOTE: PRINTF is relatively expensive in terms of CPU time, specially when used with-in execution loop. */
-         //if(counter%10 == 0)
-        	 //PRINTF("magX	%f	magY	%f	magZ	%f\r\n", magx*100, magy*100,magz*100);
-        	 //PRINTF("AccX	%f	AccY	%f	AccZ	%f\r\n", X*9.81, Y*9.81,Z*9.81);
-        	 //PRINTF("\r\n acc X = %f  acc Y = %f acc Z = %f\r\n", gyroX, gyroY,gyroZ);
-            // Print results
-           // printf("Magnetometer Heading=%f \n", Heading);
+
+           //PRINTF("roll	%f	pitch	%f	yaw	%f\r\n", MAD_getRoll(), MAD_getPitch(), MAD_getYaw());
+           PRINTF("droll	%f	dpitch	%f	dyaw	%f\r\n", gyroX, gyroY, gyroZ);
          }
-        //PRINTF("\r\n mag X = %f  mag Y = %f mag Z = %f\r\n", magx, magy,magz);
-
         pitIsrFlag = false;
-
     }
 }
 

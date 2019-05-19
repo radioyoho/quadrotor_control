@@ -36,7 +36,10 @@ volatile uint8_t counter = 0;
 float invSqrt(float x);
 
 //====================================================================================================
-// Functions
+// OUTPUT VARIABLES
+float oRoll = 0;
+float oPitch = 0;
+float oYaw = 0;
 
 //---------------------------------------------------------------------------------------------------
 // AHRS algorithm update
@@ -108,11 +111,6 @@ void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float 
 		_8bz = 2.0f * _4bz;
 
 		// Gradient decent algorithm corrective step
-		//s0 = -_2q2 * (2.0f * q1q3 - _2q0q2 - ax) + _2q1 * (2.0f * q0q1 + _2q2q3 - ay) - _2bz * q2 * (_2bx * (0.5f - q2q2 - q3q3) + _2bz * (q1q3 - q0q2) - mx) + (-_2bx * q3 + _2bz * q1) * (_2bx * (q1q2 - q0q3) + _2bz * (q0q1 + q2q3) - my) + _2bx * q2 * (_2bx * (q0q2 + q1q3) + _2bz * (0.5f - q1q1 - q2q2) - mz);
-		//s1 = _2q3 * (2.0f * q1q3 - _2q0q2 - ax) + _2q0 * (2.0f * q0q1 + _2q2q3 - ay) - 4.0f * q1 * (1 - 2.0f * q1q1 - 2.0f * q2q2 - az) + _2bz * q3 * (_2bx * (0.5f - q2q2 - q3q3) + _2bz * (q1q3 - q0q2) - mx) + (_2bx * q2 + _2bz * q0) * (_2bx * (q1q2 - q0q3) + _2bz * (q0q1 + q2q3) - my) + (_2bx * q3 - _4bz * q1) * (_2bx * (q0q2 + q1q3) + _2bz * (0.5f - q1q1 - q2q2) - mz);
-		//s2 = -_2q0 * (2.0f * q1q3 - _2q0q2 - ax) + _2q3 * (2.0f * q0q1 + _2q2q3 - ay) - 4.0f * q2 * (1 - 2.0f * q1q1 - 2.0f * q2q2 - az) + (-_4bx * q2 - _2bz * q0) * (_2bx * (0.5f - q2q2 - q3q3) + _2bz * (q1q3 - q0q2) - mx) + (_2bx * q1 + _2bz * q3) * (_2bx * (q1q2 - q0q3) + _2bz * (q0q1 + q2q3) - my) + (_2bx * q0 - _4bz * q2) * (_2bx * (q0q2 + q1q3) + _2bz * (0.5f - q1q1 - q2q2) - mz);
-		//s3 = _2q1 * (2.0f * q1q3 - _2q0q2 - ax) + _2q2 * (2.0f * q0q1 + _2q2q3 - ay) + (-_4bx * q3 + _2bz * q1) * (_2bx * (0.5f - q2q2 - q3q3) + _2bz * (q1q3 - q0q2) - mx) + (-_2bx * q0 + _2bz * q2) * (_2bx * (q1q2 - q0q3) + _2bz * (q0q1 + q2q3) - my) + _2bx * q1 * (_2bx * (q0q2 + q1q3) + _2bz * (0.5f - q1q1 - q2q2) - mz);
-
 		s0= -_2q2*(2*(q1q3 - q0q2) - ax)    +   _2q1*(2*(q0q1 + q2q3) - ay)   +  -_4bz*q2*(_4bx*(0.5 - q2q2 - q3q3) + _4bz*(q1q3 - q0q2) - mx)   +   (-_4bx*q3+_4bz*q1)*(_4bx*(q1q2 - q0q3) + _4bz*(q0q1 + q2q3) - my)    +   _4bx*q2*(_4bx*(q0q2 + q1q3) + _4bz*(0.5 - q1q1 - q2q2) - mz);
 		s1= _2q3*(2*(q1q3 - q0q2) - ax) +   _2q0*(2*(q0q1 + q2q3) - ay) +   -4*q1*(2*(0.5 - q1q1 - q2q2) - az)    +   _4bz*q3*(_4bx*(0.5 - q2q2 - q3q3) + _4bz*(q1q3 - q0q2) - mx)   + (_4bx*q2+_4bz*q0)*(_4bx*(q1q2 - q0q3) + _4bz*(q0q1 + q2q3) - my)   +   (_4bx*q3-_8bz*q1)*(_4bx*(q0q2 + q1q3) + _4bz*(0.5 - q1q1 - q2q2) - mz);
 		s2= -_2q0*(2*(q1q3 - q0q2) - ax)    +     _2q3*(2*(q0q1 + q2q3) - ay)   +   (-4*q2)*(2*(0.5 - q1q1 - q2q2) - az) +   (-_8bx*q2-_4bz*q0)*(_4bx*(0.5 - q2q2 - q3q3) + _4bz*(q1q3 - q0q2) - mx)+(_4bx*q1+_4bz*q3)*(_4bx*(q1q2 - q0q3) + _4bz*(q0q1 + q2q3) - my)+(_4bx*q0-_8bz*q2)*(_4bx*(q0q2 + q1q3) + _4bz*(0.5 - q1q1 - q2q2) - mz);
@@ -144,24 +142,19 @@ void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float 
 	q2 *= recipNorm;
 	q3 *= recipNorm;
 
-
-    /*double R11 = 2.*q0*q0 -1 +2.*q1*q1;
-    double R21 = 2.*(q1*q2 - q0*q3);
-    double R31 = 2.*(q1*q3 + q0*q2);
-    double R32 = 2.*(q2*q3 - q0*q1);
-    double R33 = 2.*q0*q0 -1 +2.*q3*q3;
-
-    double phi = atan2(R32, R33 );
-    double theta = -atan(R31 / sqrt(1-R31*R31) );
-    double psi = atan2(R21, R11 );*/
 	double roll;
 	roll = atan2(2*q0*q1+2*q2*q3,1 - 2*(q1*q1+q2*q2));
 	double pitch;
 	pitch = asin((2.0f*(q0*q2-q3*q1)));
 	double yaw = atan2(2*(q0*q3 + q1*q2),1 - 2*(q2*q2 + q3*q3));
-	//counter += 1;
-	//if(counter%4 == 0)
-	PRINTF("roll	%f	pitch	%f	yaw	%f\r\n", roll*180/3.1416,pitch*180/3.1416,yaw*180/3.1416);
+
+	/* Set the output variables to return degrees */
+	oRoll = roll*180/3.1416;
+	oPitch = pitch*180/3.1416;
+	oYaw = yaw*180/3.1416;
+
+	/* Uncomment to debug */
+	//PRINTF("roll	%f	pitch	%f	yaw	%f\r\n", roll*180/3.1416,pitch*180/3.1416,yaw*180/3.1416);
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -236,15 +229,18 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
 	q2 *= recipNorm;
 	q3 *= recipNorm;
 
-	//uint8_t roll = atan((2*q0*q2-2*q1*q3)/(q0^2 + q1^2 - q2^2 - q3^2));
-	//uint8_t pitch = atan(2*q0*q3 + 2*q1*q2);
 	double roll;
 	roll = atan2(2*q0*q1+2*q2*q3,1 - 2*(q1*q1-q2*q2));
 	double pitch;
 	pitch = asin((2.0f*(q0*q2-q3*q1)));
 	double yaw = atan2(2*(q0*q3 + q1*q2),1- 2*(q2*q2 - q3*q3));
 	counter += 1;
-	//if(counter%4 == 0)
+
+	/* Set the output variables to return degrees */
+	oRoll = roll*180/3.1416;
+	oPitch = pitch*180/3.1416;
+	oYaw = yaw*180/3.1416;
+
 	PRINTF("\r\n roll = %f  pitch = %f yaw = %f\r\n", roll*180/3.1416,pitch*180/3.1416,yaw*180/3.1416);
 }
 
@@ -262,6 +258,17 @@ float invSqrt(float x) {
 	return y;
 }
 
+float MAD_getRoll(){
+	return oRoll;
+}
+
+float MAD_getPitch(){
+	return oPitch;
+}
+
+float MAD_getYaw(){
+	return oYaw;
+}
 //====================================================================================================
 // END OF CODE
 //====================================================================================================
