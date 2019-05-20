@@ -66,12 +66,12 @@
 #define  FLEX_TIMER_CHF   0x80
 
 /* CONTROL DEFINES */
-#define MAX_CNV 48
-#define MIN_CNV 96
+#define MAX_CNV 72
+#define MIN_CNV 50
 #define WMAX 1068.141502F
 
 
-//void FlexTimer_updateCHValue(sint16 channelValue);
+void FLEX_updateMotors(uint16_t, uint16_t, uint16_t, uint16_t);
 
 void FlexTimer_Init();
 

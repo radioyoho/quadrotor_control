@@ -20,6 +20,20 @@ void FlexTimer_updateCHValue(sint16 channelValue)
 	//FTM0->CONTROLS[0].CnV = channelValue;
 //}
 
+void FLEX_updateMotors(uint16_t cnv1, uint16_t cnv2, uint16_t cnv3, uint16_t cnv4){
+	FTM0->CONTROLS[2].CnV = cnv1;
+	FTM3->CONTROLS[5].CnV = cnv2;
+	FTM3->CONTROLS[4].CnV = cnv3;
+	FTM0->CONTROLS[0].CnV = cnv4;
+	/*
+	 * ptc
+	 * 5
+	 * 9
+	 * 8
+	 * 1
+	 *
+	 * */
+}
 
 void FlexTimer_Init()
 {

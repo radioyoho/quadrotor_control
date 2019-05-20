@@ -149,9 +149,9 @@ void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float 
 	double yaw = atan2(2*(q0*q3 + q1*q2),1 - 2*(q2*q2 + q3*q3));
 
 	/* Set the output variables to return degrees */
-	oRoll = roll*180/3.1416;
-	oPitch = pitch*180/3.1416;
-	oYaw = yaw*180/3.1416;
+	oRoll = roll;
+	oPitch = pitch;
+	oYaw = yaw;
 
 	/* Uncomment to debug */
 	//PRINTF("roll	%f	pitch	%f	yaw	%f\r\n", roll*180/3.1416,pitch*180/3.1416,yaw*180/3.1416);

@@ -37,6 +37,7 @@
 
 #define PIT_LED_HANDLER PIT0_IRQHandler
 #define PIT_IRQ_ID PIT0_IRQn
+#define GPIO_CLOCK_GATING_PORTB 0x00000400
 /* Get source clock for PIT driver */
 #define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
 #define LED_INIT() LED_RED_INIT(LOGIC_LED_ON)
@@ -360,11 +361,11 @@ int main(void)
     //cambiar ffclk
     CLOCK_CONFIG_SetFllExtRefDiv(5);
 
-    SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTC;
+    SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTC|GPIO_CLOCK_GATING_PORTC;
 
     //configurar pines para pwm
    	PORTC->PCR[1]   = PORT_PCR_MUX(0x4);
-   	//PORTC->PCR[5]   = PORT_PCR_MUX(0x7);
+   	PORTC->PCR[5]   = PORT_PCR_MUX(0x7);
    	PORTC->PCR[8]   = PORT_PCR_MUX(0x3);
    	PORTC->PCR[9]   = PORT_PCR_MUX(0x3);
 
@@ -502,17 +503,17 @@ int main(void)
 	const float dx1ref = 0, dx3ref = 0, dx5ref = 0;
 	const float ddx1ref = 0, ddx3ref = 0, ddx5ref = 0;
 	float x2ref, x4ref, x6ref;
-	float x1, x2 = 0, x3, x4 = 0, x5, x6 = 0;
+	float x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
 	float k1 = 4, k2 = 6, k3 = 4, k4 = 6, k5 = 3, k6 = 5;
 	float h, w1, w2, w3, w4;
 	uint8_t cnv1, cnv2, cnv3, cnv4;
 
 // ------------------------------------------------- //
 
-    w1 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u3 - (1/2)*u4)));
-    w2 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u2 + (1/2)*u4)));
-    w3 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u3 - (1/2)*u4)));
-    w4 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u2 + (1/2)*u4)));
+    w1 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 - (1/(float)2)*u3 - (1/(float)2)*u4)));
+    w2 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 - (1/(float)2)*u2 + (1/(float)2)*u4)));
+    w3 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 + (1/(float)2)*u3 - (1/(float)2)*u4)));
+    w4 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 + (1/(float)2)*u2 + (1/(float)2)*u4)));
 
     h = w2 + w4 - w1 - w3;
 
@@ -577,6 +578,14 @@ int main(void)
            /* ----------------------------- CONTROL ------------------------------------- */
           //Bloque 1
           //U(1) = 1;
+           x1 = MAD_getRoll();
+           x3 = MAD_getPitch();
+           x5 = MAD_getYaw();
+
+           x2 = gyroX;
+           x4 = gyroY;
+           x6 = gyroZ;
+
            u1 = (g*m)/(cos(x1)*cos(x3));
 
            //Bloque 2 Roll
@@ -599,10 +608,10 @@ int main(void)
            /* -------------------------------------------------------------------------- */
 
            /* ------------------------ ASIGNACION A PWM -------------------------------- */
-           w1 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u3 - (1/2)*u4)));
-           w2 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u2 + (1/2)*u4)));
-           w3 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u3 - (1/2)*u4)));
-           w4 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u2 + (1/2)*u4)));
+           w1 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 - (1/(float)2)*u3 - (1/(float)2)*u4)));
+           w2 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 - (1/(float)2)*u2 + (1/(float)2)*u4)));
+           w3 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 + (1/(float)2)*u3 - (1/(float)2)*u4)));
+           w4 = sqrt((float)abs(((float)1/(float)b)*((1/(float)4)*u1 + (1/(float)2)*u2 + (1/(float)2)*u4)));
 
            h = w2 + w4 - w1 - w3;
 
@@ -610,6 +619,43 @@ int main(void)
            cnv2 = w2*(MAX_CNV/(WMAX*2)) + MIN_CNV;
            cnv3 = w3*(MAX_CNV/(WMAX*2)) + MIN_CNV;
            cnv4 = w4*(MAX_CNV/(WMAX*2)) + MIN_CNV;
+
+           /* Make sure values don't surpass max and min */
+           if (cnv1 < MIN_CNV){
+        	   cnv1 = MIN_CNV;
+           }
+
+           if (cnv1 > MAX_CNV){
+        	   cnv1 = MAX_CNV;
+           }
+
+           if (cnv2 < MIN_CNV){
+        	   cnv2 = MIN_CNV;
+           }
+
+           if (cnv2 > MAX_CNV){
+        	   cnv2 = MAX_CNV;
+           }
+
+           if (cnv3 < MIN_CNV){
+        	   cnv3 = MIN_CNV;
+           }
+
+           if (cnv3 > MAX_CNV){
+        	   cnv3 = MAX_CNV;
+           }
+
+           if (cnv4 < MIN_CNV){
+        	   cnv4 = MIN_CNV;
+           }
+
+           if (cnv4 > MAX_CNV){
+        	   cnv4 = MAX_CNV;
+           }
+
+           /* Make sure the angles don't surpass limits */
+
+           FLEX_updateMotors(cnv1, cnv2, cnv3, cnv4);
          }
         pitIsrFlag = false;
     }
