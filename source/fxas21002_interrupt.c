@@ -478,10 +478,10 @@ int main(void)
 	float Iy = 0.0216;
 	float Iz = 0.0432;
 
-	float Jr = 0.00003357e-5;
+	float Jr = 0.00003357;
 	float l = 0.30;
 
-	float b = 0.00000298e-6;
+	float b = 0.00000298;
 	float g = 9.81;
 	float m = 1.83;
 
@@ -496,8 +496,25 @@ int main(void)
 	float c2 = l/Iy;
 	float c3 = 1/Iz;
 
+	float u1 = 17.95, u2 = 0, u3 = 0, u4 = 0;
+	float z1, z2, z3, z4, z5, z6;
+	const float x1ref = 0, x3ref = 0, x5ref = 0;
+	const float dx1ref = 0, dx3ref = 0, dx5ref = 0;
+	const float ddx1ref = 0, ddx3ref = 0, ddx5ref = 0;
+	float x2ref, x4ref, x6ref;
+	float x1, x2 = 0, x3, x4 = 0, x5, x6 = 0;
+	float k1 = 4, k2 = 6, k3 = 4, k4 = 6, k5 = 3, k6 = 5;
+	float h, w1, w2, w3, w4;
+	uint8_t cnv1, cnv2, cnv3, cnv4;
+
 // ------------------------------------------------- //
 
+    w1 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u3 - (1/2)*u4)));
+    w2 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u2 + (1/2)*u4)));
+    w3 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u3 - (1/2)*u4)));
+    w4 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u2 + (1/2)*u4)));
+
+    h = w2 + w4 - w1 - w3;
 
 
     for (;;) /* Forever loop */
@@ -556,6 +573,43 @@ int main(void)
 
            //PRINTF("roll	%f	pitch	%f	yaw	%f\r\n", MAD_getRoll(), MAD_getPitch(), MAD_getYaw());
            //PRINTF("droll	%f	dpitch	%f	dyaw	%f\r\n", gyroX, gyroY, gyroZ);
+
+           /* ----------------------------- CONTROL ------------------------------------- */
+          //Bloque 1
+          //U(1) = 1;
+           u1 = (g*m)/(cos(x1)*cos(x3));
+
+           //Bloque 2 Roll
+           z1 = x1ref - x1;
+           x2ref = dx1ref + k1*z1;
+           z2 = x2ref - x2;
+           u2 = (ddx1ref + k1*(dx1ref - x2) - x4*x6*a1 + b1*x4*h + k2*z2)/c1;
+
+           //Bloque 3 Pitch
+           z3 = x3ref - x3;
+           x4ref = dx3ref + k3*z3;
+           z4 = x4ref - x4;
+           u3 = (ddx3ref + k3*(dx3ref - x4) - x2*x6*a2 - b2*x2*h + k4*z4)/c2;
+
+           //Bloque 4 Yaw
+           z5 = x5ref - x5;
+           x6ref = dx5ref + k5*z5;
+           z6 = x6ref - x6;
+           u4 = (ddx5ref + k5*(dx5ref - x6) - x2*x4*a3 + k6*z6)/c3;
+           /* -------------------------------------------------------------------------- */
+
+           /* ------------------------ ASIGNACION A PWM -------------------------------- */
+           w1 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u3 - (1/2)*u4)));
+           w2 = sqrt(abs((1/b)*((1/4)*u1 - (1/2)*u2 + (1/2)*u4)));
+           w3 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u3 - (1/2)*u4)));
+           w4 = sqrt(abs((1/b)*((1/4)*u1 + (1/2)*u2 + (1/2)*u4)));
+
+           h = w2 + w4 - w1 - w3;
+
+           cnv1 = w1*(MAX_CNV/(WMAX*2)) + MIN_CNV;
+           cnv2 = w2*(MAX_CNV/(WMAX*2)) + MIN_CNV;
+           cnv3 = w3*(MAX_CNV/(WMAX*2)) + MIN_CNV;
+           cnv4 = w4*(MAX_CNV/(WMAX*2)) + MIN_CNV;
          }
         pitIsrFlag = false;
     }

@@ -65,6 +65,10 @@
 #define  FLEX_TIMER_CHIE  0x40
 #define  FLEX_TIMER_CHF   0x80
 
+/* CONTROL DEFINES */
+#define MAX_CNV 48
+#define MIN_CNV 96
+#define WMAX 1068.141502F
 
 
 //void FlexTimer_updateCHValue(sint16 channelValue);
