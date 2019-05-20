@@ -504,7 +504,7 @@ int main(void)
 	const float ddx1ref = 0, ddx3ref = 0, ddx5ref = 0;
 	float x2ref, x4ref, x6ref;
 	float x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
-	float k1 = 4, k2 = 6, k3 = 4, k4 = 6, k5 = 3, k6 = 5;
+	float k1 = 50, k2 = 60, k3 = 50, k4 = 60, k5 = 50, k6 = 60;
 	float h, w1, w2, w3, w4;
 	uint8_t cnv1, cnv2, cnv3, cnv4;
 
@@ -586,7 +586,8 @@ int main(void)
            x4 = gyroY;
            x6 = gyroZ;
 
-           u1 = (g*m)/(cos(x1)*cos(x3));
+           //u1 = (g*m)/(cos(x1*3.1416/180.0)*cos(x3*3.1416/180.0));
+           u1 = 17.95;
 
            //Bloque 2 Roll
            z1 = x1ref - x1;
@@ -615,10 +616,10 @@ int main(void)
 
            h = w2 + w4 - w1 - w3;
 
-           cnv1 = w1*(MAX_CNV/(WMAX*2)) + MIN_CNV;
-           cnv2 = w2*(MAX_CNV/(WMAX*2)) + MIN_CNV;
-           cnv3 = w3*(MAX_CNV/(WMAX*2)) + MIN_CNV;
-           cnv4 = w4*(MAX_CNV/(WMAX*2)) + MIN_CNV;
+           cnv1 = w1*(MAX_CNV/(WMAX*2.0)) + MIN_CNV;
+           cnv2 = w2*(MAX_CNV/(WMAX*2.0)) + MIN_CNV;
+           cnv3 = w3*(MAX_CNV/(WMAX*2.0)) + MIN_CNV;
+           cnv4 = w4*(MAX_CNV/(WMAX*2.0)) + MIN_CNV;
 
            /* Make sure values don't surpass max and min */
            if (cnv1 < MIN_CNV){
@@ -656,6 +657,8 @@ int main(void)
            /* Make sure the angles don't surpass limits */
 
            FLEX_updateMotors(cnv1, cnv2, cnv3, cnv4);
+           //FLEX_updateMotors(48, 72, 48, 48);
+           //cnv2 con 52 no agarra
          }
         pitIsrFlag = false;
     }

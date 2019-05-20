@@ -66,9 +66,9 @@
 #define  FLEX_TIMER_CHF   0x80
 
 /* CONTROL DEFINES */
-#define MAX_CNV 72
-#define MIN_CNV 50
-#define WMAX 1068.141502F
+#define MAX_CNV 87
+#define MIN_CNV 52
+#define WMAX 1068.144F
 
 
 void FLEX_updateMotors(uint16_t, uint16_t, uint16_t, uint16_t);
