@@ -73,7 +73,7 @@ extern uint32_t SystemCoreClock;
  * Param frdiv   : The value to set FRDIV.
  *
  *END**************************************************************************/
-static void CLOCK_CONFIG_SetFllExtRefDiv(uint8_t frdiv)
+void CLOCK_CONFIG_SetFllExtRefDiv(uint8_t frdiv)
 {
     MCG->C1 = ((MCG->C1 & ~MCG_C1_FRDIV_MASK) | MCG_C1_FRDIV(frdiv));
 }

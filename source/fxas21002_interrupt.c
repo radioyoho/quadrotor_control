@@ -22,6 +22,7 @@
 #include <math.h>
 #include "fsl_pit.h"
 #include "MadgwickAHRS.h"
+#include "FlexTimer.h"
 //-----------------------------------------------------------------------
 // CMSIS Includes
 //-----------------------------------------------------------------------
@@ -67,6 +68,8 @@ const registerreadlist_t fxas21002_Output_Values[] = {
     {.readFrom = FXAS21002_OUT_X_MSB, .numBytes = FXAS21002_GYRO_DATA_SIZE}, __END_READ_DATA__};
 
 #define RAW_ACCEL_DATA_SIZE (12)
+
+#define GPIO_CLOCK_GATING_PORTC 0x00000800
 
 //-----------------------------------------------------------------------
 // Constants
@@ -349,12 +352,23 @@ int main(void)
     fxas21002_i2c_sensorhandle_t FXAS21002drv;
     GENERIC_DRIVER_GPIO *gpioDriver = &Driver_GPIO_KSDK;
 
-
-
     /*! Initialize the MCU hardware. */
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
+
+    //cambiar ffclk
+    CLOCK_CONFIG_SetFllExtRefDiv(5);
+
+    SIM->SCGC5 |= GPIO_CLOCK_GATING_PORTC;
+
+    //configurar pines para pwm
+   	PORTC->PCR[1]   = PORT_PCR_MUX(0x4);
+   	//PORTC->PCR[5]   = PORT_PCR_MUX(0x7);
+   	PORTC->PCR[8]   = PORT_PCR_MUX(0x3);
+   	PORTC->PCR[9]   = PORT_PCR_MUX(0x3);
+
+   	FlexTimer_Init();
 
     PRINTF("\r\n ISSDK FXAS21002 sensor driver example demonstration with interrupt mode.\r\n");
 
@@ -458,6 +472,34 @@ int main(void)
 	EnableIRQ(PIT_IRQ_ID);
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
 
+// ----------- VALORES PARA CONTROL ---------------- //
+
+	float Ix = 0.0216;
+	float Iy = 0.0216;
+	float Iz = 0.0432;
+
+	float Jr = 0.00003357e-5;
+	float l = 0.30;
+
+	float b = 0.00000298e-6;
+	float g = 9.81;
+	float m = 1.83;
+
+	float a1 = (Iy - Iz)/Ix;
+	float a2 = (Iz - Ix)/Iy;
+	float a3 = (Ix - Iy)/Iz;
+
+	float b1 = Jr/Ix;
+	float b2 = Jr/Iy;
+
+	float c1 = l/Ix;
+	float c2 = l/Iy;
+	float c3 = 1/Iz;
+
+// ------------------------------------------------- //
+
+
+
     for (;;) /* Forever loop */
     {        /* In ISR Mode we do not need to check Data Ready Register.
               * The receipt of interrupt will indicate data is ready. */
@@ -513,7 +555,7 @@ int main(void)
         /* NOTE: PRINTF is relatively expensive in terms of CPU time, specially when used with-in execution loop. */
 
            //PRINTF("roll	%f	pitch	%f	yaw	%f\r\n", MAD_getRoll(), MAD_getPitch(), MAD_getYaw());
-           PRINTF("droll	%f	dpitch	%f	dyaw	%f\r\n", gyroX, gyroY, gyroZ);
+           //PRINTF("droll	%f	dpitch	%f	dyaw	%f\r\n", gyroX, gyroY, gyroZ);
          }
         pitIsrFlag = false;
     }

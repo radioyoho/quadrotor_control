@@ -34,6 +34,8 @@ extern const sim_clock_config_t simConfig_BOARD_BootClockRUN;
  */
 extern const osc_config_t oscConfig_BOARD_BootClockRUN;
 
+void CLOCK_CONFIG_SetFllExtRefDiv(uint8_t);
+
 /*******************************************************************************
  * API for BOARD_BootClockRUN configuration
  ******************************************************************************/

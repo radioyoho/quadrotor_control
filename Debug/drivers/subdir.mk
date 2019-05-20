@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../drivers/FlexTimer.c \
 ../drivers/fsl_clock.c \
 ../drivers/fsl_common.c \
 ../drivers/fsl_dmamux.c \
@@ -26,6 +27,7 @@ C_SRCS += \
 ../drivers/fsl_uart_edma.c 
 
 OBJS += \
+./drivers/FlexTimer.o \
 ./drivers/fsl_clock.o \
 ./drivers/fsl_common.o \
 ./drivers/fsl_dmamux.o \
@@ -48,6 +50,7 @@ OBJS += \
 ./drivers/fsl_uart_edma.o 
 
 C_DEPS += \
+./drivers/FlexTimer.d \
 ./drivers/fsl_clock.d \
 ./drivers/fsl_common.d \
 ./drivers/fsl_dmamux.d \

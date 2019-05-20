@@ -9,10 +9,10 @@ source/fxas21002_interrupt.o source/fxas21002_interrupt.d: \
  ../utilities/fsl_debug_console.h \
  ../component/serial_manager/serial_manager.h \
  ../component/serial_manager/serial_port_uart.h ../drivers/fsl_pit.h \
- ../source/MadgwickAHRS.h ../CMSIS_driver/Driver_I2C.h \
- ../CMSIS_driver/Driver_Common.h ../board/issdk_hal.h \
- ../board/frdm_k64f.h ../board/pin_mux.h ../drivers/fsl_smc.h \
- ../device/MK64F12.h ../board/RTE_Device.h ../gpio_driver/gpio_driver.h \
+ ../source/MadgwickAHRS.h ../drivers/FlexTimer.h ../device/MK64F12.h \
+ ../CMSIS_driver/Driver_I2C.h ../CMSIS_driver/Driver_Common.h \
+ ../board/issdk_hal.h ../board/frdm_k64f.h ../board/pin_mux.h \
+ ../drivers/fsl_smc.h ../board/RTE_Device.h ../gpio_driver/gpio_driver.h \
  ../CMSIS_driver/Driver_Common.h ../gpio_driver/Driver_GPIO.h \
  ../drivers/fsl_port.h ../board/frdm_stbc_agm01_shield.h \
  ../drivers/fsl_i2c_cmsis.h ../board/RTE_Device.h ../drivers/fsl_i2c.h \
@@ -70,6 +70,10 @@ source/fxas21002_interrupt.o source/fxas21002_interrupt.d: \
 
 ../source/MadgwickAHRS.h:
 
+../drivers/FlexTimer.h:
+
+../device/MK64F12.h:
+
 ../CMSIS_driver/Driver_I2C.h:
 
 ../CMSIS_driver/Driver_Common.h:
@@ -81,8 +85,6 @@ source/fxas21002_interrupt.o source/fxas21002_interrupt.d: \
 ../board/pin_mux.h:
 
 ../drivers/fsl_smc.h:
-
-../device/MK64F12.h:
 
 ../board/RTE_Device.h:
 
